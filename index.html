@@ -5,19 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dandadan AI - Lucas_Will Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Permanent+Marker&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
                         url('https://images.alphacoders.com/135/1358327.png');
             background-size: cover; background-position: center; background-attachment: fixed;
             overflow: hidden;
         }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .signature-font { font-family: 'Permanent Marker', cursive; }
+        
+        /* Estilo da Caixa de Diálogo (Markdown) */
+        .prose-ai { color: #e5e7eb; font-size: 0.875rem; line-height: 1.6; }
+        .prose-ai code { background: rgba(0, 242, 255, 0.1); padding: 2px 4px; border-radius: 4px; color: #00f2ff; font-family: monospace; }
+        .prose-ai pre { background: rgba(0, 0, 0, 0.3); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); }
+        .prose-ai ul { list-style-type: disc; margin-left: 20px; }
+        
         #chat-window::-webkit-scrollbar { width: 4px; }
         #chat-window::-webkit-scrollbar-thumb { background: rgba(0, 242, 255, 0.3); border-radius: 10px; }
+        
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .mic-active { animation: pulse-red 1.5s infinite; background: #ef4444 !important; color: white !important; }
     </style>
 </head>
 <body class="h-[100dvh] w-full flex flex-col items-center justify-center relative">
@@ -33,68 +44,98 @@
         <header class="p-4 md:p-5 border-b border-white/10 flex items-center gap-3 bg-white/5 mt-14 md:mt-0">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-tr from-cyan-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-white border border-white/20">LW</div>
             <div>
-                <h1 class="font-semibold text-sm md:text-lg text-white">Dandadan Core v2.0</h1>
-                <p class="text-[10px] md:text-xs text-cyan-400">Lucas_Will System | Arquivos Ativos</p>
+                <h1 class="font-semibold text-sm md:text-lg text-white tracking-wide">LUCAS_WILL CORE AI</h1>
+                <p class="text-[10px] md:text-xs text-cyan-400 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"></span> Sistema Multimodal Ativo
+                </p>
             </div>
         </header>
 
-        <div id="chat-window" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-            <div class="bg-white/5 p-4 rounded-2xl rounded-tl-none max-w-[85%] text-gray-200 text-xs md:text-sm border border-white/5">
-                Olá Lucas_Will. Agora posso analisar textos de arquivos e fotos. Use o ícone de anexo!
+        <div id="chat-window" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+            <div class="flex justify-start">
+                <div class="bg-white/5 p-4 rounded-2xl rounded-tl-none max-w-[90%] text-gray-200 border border-white/10 prose-ai">
+                    Olá **Lucas_Will**. Sou sua interface avançada.
+                    - Digite comandos
+                    - Envie arquivos 📎
+                    - Ou use o **Microfone** 🎙️
+                </div>
             </div>
         </div>
 
-        <div id="file-preview" class="hidden px-6 py-2 bg-cyan-900/30 flex items-center gap-2 text-[10px] text-cyan-300">
-            <span id="file-name" class="truncate max-w-[200px]">arquivo.pdf</span>
+        <div id="file-preview" class="hidden px-6 py-2 bg-cyan-900/30 flex items-center gap-2 text-[10px] text-cyan-300 border-t border-white/10">
+            <span id="file-name" class="truncate max-w-[200px]">arquivo.txt</span>
             <button onclick="clearFile()" class="text-red-400 font-bold ml-2">✕</button>
         </div>
 
         <div class="p-3 md:p-6 bg-black/40 border-t border-white/10">
-            <div class="relative flex items-center gap-2 max-w-5xl mx-auto w-full">
-                
-                <label class="cursor-pointer bg-white/10 p-3 rounded-xl hover:bg-white/20 transition-all border border-white/10">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                    </svg>
-                    <input type="file" id="file-input" class="hidden" onchange="handleFile(this)">
-                </label>
+            <div class="flex flex-col gap-2 max-w-5xl mx-auto w-full">
+                <div class="relative flex items-center gap-2">
+                    
+                    <label class="cursor-pointer bg-white/5 p-3 rounded-xl hover:bg-white/10 border border-white/10 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                        <input type="file" id="file-input" class="hidden" onchange="handleFile(this)">
+                    </label>
 
-                <input id="user-input" type="text" 
-                    class="flex-1 bg-white/5 border border-white/10 rounded-2xl py-3 md:py-4 px-4 outline-none focus:border-cyan-500 text-white text-sm"
-                    placeholder="Escreva ou anexe algo...">
-                
-                <button onclick="enviar()" id="btn" class="bg-cyan-600 p-3 md:px-6 rounded-xl font-bold text-white active:scale-90 disabled:opacity-50 text-xs uppercase">
-                    OK
-                </button>
+                    <div class="flex-1 relative">
+                        <input id="user-input" type="text" 
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 md:py-4 pl-4 pr-12 outline-none focus:border-cyan-500 text-white text-sm"
+                            placeholder="Mensagem...">
+                        
+                        <button onclick="toggleMic()" id="mic-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-cyan-400 p-1 rounded-full transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                        </button>
+                    </div>
+                    
+                    <button onclick="enviar()" id="btn" class="bg-cyan-600 hover:bg-cyan-500 p-3 md:px-8 rounded-xl font-bold text-white shadow-lg shadow-cyan-900/20 active:scale-95 transition-all text-xs">
+                        ENVIAR
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let attachedContent = "";
+        let recognition;
+
+        // Configuração do Microfone (Speech Recognition)
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'pt-BR';
+
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                document.getElementById('user-input').value = text;
+                toggleMic(); // Desliga após ouvir
+            };
+
+            recognition.onerror = () => toggleMic();
+        }
+
+        function toggleMic() {
+            const micBtn = document.getElementById('mic-btn');
+            if (micBtn.classList.contains('mic-active')) {
+                micBtn.classList.remove('mic-active');
+                recognition.stop();
+            } else {
+                micBtn.classList.add('mic-active');
+                recognition.start();
+            }
+        }
 
         function handleFile(input) {
             const file = input.files[0];
             if (!file) return;
-
             document.getElementById('file-preview').classList.remove('hidden');
             document.getElementById('file-name').innerText = "Anexo: " + file.name;
-
             const reader = new FileReader();
-            reader.onload = function(e) {
-                // Se for texto, lemos o conteúdo. Se for foto/outro, enviamos o nome e o tipo.
-                if (file.type.includes('text') || file.name.endsWith('.txt')) {
-                    attachedContent = "\n\n[CONTEÚDO DO ARQUIVO ANEXADO]:\n" + e.target.result;
-                } else {
-                    attachedContent = `\n\n[O usuário anexou um arquivo do tipo ${file.type} chamado ${file.name}]`;
-                }
-            };
+            reader.onload = (e) => attachedContent = "\n\n[ARQUIVO]: " + e.target.result;
             reader.readAsText(file);
         }
 
         function clearFile() {
             attachedContent = "";
-            document.getElementById('file-input').value = "";
             document.getElementById('file-preview').classList.add('hidden');
         }
 
@@ -106,7 +147,7 @@
             if(!prompt && !attachedContent) return;
 
             btn.disabled = true;
-            chat.innerHTML += `<div class="flex justify-end"><div class="bg-cyan-600/80 p-3 rounded-2xl max-w-[85%] text-white text-xs md:text-sm">${prompt} ${attachedContent ? '📎' : ''}</div></div>`;
+            chat.innerHTML += `<div class="flex justify-end"><div class="bg-cyan-600 p-3 rounded-2xl rounded-tr-none max-w-[85%] text-white text-sm shadow-lg">${prompt}</div></div>`;
             
             const fullPrompt = prompt + attachedContent;
             input.value = '';
@@ -123,20 +164,23 @@
                 const data = await res.json();
                 const resposta = data.choices[0].message.content;
 
+                // Renderiza a resposta usando MARKED (Markdown)
                 chat.innerHTML += `
                     <div class="flex justify-start">
-                        <div class="bg-white/10 p-3 rounded-2xl max-w-[85%] text-gray-100 text-xs md:text-sm border border-white/5">
-                            <b class="text-cyan-400 block text-[9px] uppercase">Lucas_Will Assistant</b>
-                            ${resposta}
+                        <div class="bg-white/10 p-4 rounded-2xl rounded-tl-none max-w-[90%] border border-white/5 shadow-xl prose-ai">
+                            <b class="text-cyan-400 block text-[10px] uppercase tracking-widest mb-2">Lucas_Will Core</b>
+                            ${marked.parse(resposta)}
                         </div>
                     </div>`;
             } catch (err) {
-                chat.innerHTML += `<div class="text-red-400 text-center">Erro no sistema.</div>`;
+                chat.innerHTML += `<div class="text-red-500 text-center text-xs p-2">Falha crítica no Core.</div>`;
             } finally {
                 btn.disabled = false;
                 chat.scrollTop = chat.scrollHeight;
             }
         }
+
+        document.getElementById('user-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') enviar(); });
     </script>
 </body>
 </html>
