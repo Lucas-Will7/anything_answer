@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Chat Sem Censura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex flex-col h-screen">
+
+    <header class="p-4 bg-gray-800 text-center font-bold text-xl border-b border-gray-700">
+        ANYTHING
+    </header>
+
+    <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <div class="bg-gray-700 p-3 rounded-lg w-fit max-w-[80%]">Olá! Eu sou sua IA sem filtros. Como posso ajudar?</div>
+    </div>
+
+    <div class="p-4 bg-gray-800 border-t border-gray-700">
+        <div class="flex gap-2">
+            <input id="user-input" type="text" class="flex-1 bg-gray-700 p-2 rounded outline-none" placeholder="Pergunte qualquer coisa...">
+            <button onclick="enviar()" class="bg-blue-600 px-4 py-2 rounded font-bold">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        async function enviar() {
+            const input = document.getElementById('user-input');
+            const chatWindow = document.getElementById('chat-window');
+            const pergunta = input.value;
+            if(!pergunta) return;
+
+            // Mostrar pergunta na tela
+            chatWindow.innerHTML += `<div class="bg-blue-600 p-3 rounded-lg ml-auto w-fit max-w-[80%]">${pergunta}</div>`;
+            input.value = '';
+
+            // CHAMADA PARA A API (Aqui você conectará com o Groq/Together)
+            // Para teste gratuito, você usará sua chave de API aqui
+            const respostaIA = "Estou processando sua resposta sem filtros..."; 
+            
+            chatWindow.innerHTML += `<div class="bg-gray-700 p-3 rounded-lg w-fit max-w-[80%]">${respostaIA}</div>`;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    </script>
+</body>
+</html>
