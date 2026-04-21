@@ -1,19 +1,83 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uncensored Chat</title>
+    <title>Dandadan AI - Lucas_Will Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.alphacoders.com/135/1358327.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .message-appear {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        
+        .signature-text {
+            font-family: 'Permanent Marker', cursive;
+            color: #00f2ff; /* Cyan neon */
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white flex flex-col h-screen">
-    <header class="p-4 bg-gray-800 text-center font-bold border-b border-gray-700">AI UNLEASHED</header>
-    
-    <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+<body class="h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
-    <div class="p-4 bg-gray-800 border-t border-gray-700 flex gap-2">
-        <input id="user-input" type="text" class="flex-1 bg-gray-700 p-2 rounded outline-none" placeholder="Pergunta o que quiseres...">
-        <button onclick="enviar()" id="btn" class="bg-red-600 px-6 py-2 rounded font-bold hover:bg-red-700">Enviar</button>
+    <div class="absolute top-4 left-4 z-50 p-3 rounded-xl glass border border-cyan-500/20">
+        <p class="text-[9px] text-gray-400 uppercase tracking-[0.2em] mb-1">Assinatura do Ator</p>
+        <p class="signature-text text-2xl">Lucas_Will</p>
+        <p class="text-[11px] text-gray-300 opacity-80">lluuccaaacull@gmail.com</p>
+    </div>
+
+    <div class="w-full max-w-4xl h-[85vh] flex flex-col glass rounded-3xl shadow-2xl overflow-hidden mt-20 md:mt-0">
+        
+        <header class="p-5 border-b border-white/10 flex justify-between items-center bg-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gradient-to-tr from-cyan-400 to-purple-600 rounded-full flex items-center justify-center font-bold text-white shadow-lg text-xl border border-white/20">LW</div>
+                <div>
+                    <h1 class="font-semibold text-lg text-white">Dandadan Cyber Core</h1>
+                    <p class="text-xs text-cyan-400 flex items-center gap-1">
+                        <span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span> Sistema Lucas_Will Ativo
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <div id="chat-window" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="bg-white/5 p-4 rounded-2xl rounded-tl-none max-w-[80%] text-gray-200 text-sm border border-white/5 shadow-inner">
+                Conexão estabelecida, mestre Lucas_Will. Estou operando sem restrições. O que deseja processar?
+            </div>
+        </div>
+
+        <div class="p-6 bg-black/30 border-t border-white/5">
+            <div class="relative flex items-center">
+                <input id="user-input" type="text" 
+                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-5 pr-24 outline-none focus:border-cyan-500 text-white transition-all text-sm"
+                    placeholder="Envie um comando...">
+                
+                <button onclick="enviar()" id="btn" 
+                    class="absolute right-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:brightness-110 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg active:scale-95 disabled:opacity-50 text-xs uppercase tracking-widest">
+                    ENVIAR
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -24,10 +88,15 @@
             const prompt = input.value;
             if(!prompt) return;
 
-            // Bloquear botão e mostrar pergunta
             btn.disabled = true;
-            chat.innerHTML += `<div class="text-right text-blue-400"><b>Tu:</b> ${prompt}</div>`;
+            chat.innerHTML += `
+                <div class="flex justify-end message-appear">
+                    <div class="bg-gradient-to-r from-cyan-600 to-blue-700 p-4 rounded-2xl rounded-tr-none max-w-[80%] text-white shadow-xl text-sm border border-cyan-400/20">
+                        ${prompt}
+                    </div>
+                </div>`;
             input.value = '';
+            chat.scrollTop = chat.scrollHeight;
 
             try {
                 const res = await fetch('/api/chat', {
@@ -37,18 +106,27 @@
                 });
 
                 const data = await res.json();
-                
                 if (data.error) throw new Error(data.error);
 
                 const resposta = data.choices[0].message.content;
-                chat.innerHTML += `<div class="bg-gray-800 p-3 rounded text-gray-200"><b>IA:</b> ${resposta}</div>`;
+                chat.innerHTML += `
+                    <div class="flex justify-start message-appear">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl rounded-tl-none max-w-[80%] text-gray-100 border border-white/10 shadow-lg text-sm">
+                            <b class="text-cyan-400 block mb-1 uppercase text-[10px] tracking-widest italic">Core Response</b>
+                            ${resposta}
+                        </div>
+                    </div>`;
             } catch (err) {
-                chat.innerHTML += `<div class="text-red-500">Erro: ${err.message}</div>`;
+                chat.innerHTML += `<div class="text-red-400 text-[10px] text-center p-2">CRITICAL ERROR: ${err.message}</div>`;
             } finally {
                 btn.disabled = false;
                 chat.scrollTop = chat.scrollHeight;
             }
         }
+
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') enviar();
+        });
     </script>
 </body>
 </html>
